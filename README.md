@@ -8,10 +8,10 @@
 ```shell
 docker run \
   --rm \
-  -v $PWD/application:/var/www/html \
+  -v $PWD:/var/www/html \
+  -u $(id -u):$(id -g) \
   bestspacejam/laravel-apache \
   sh -c 'composer create-project --prefer-dist laravel/laravel . "5.5.*"'
-  
 ```
 
 
@@ -21,10 +21,24 @@ docker run \
 ```shell
 docker run \
   --rm \
-  -v $PWD/application:/var/www/html \
+  -v $PWD:/var/www/html \
+  -u $(id -u):$(id -g) \
   bestspacejam/laravel-apache \
   sh -c 'composer require barryvdh/laravel-cors'
 ```
+
+
+## Обновление пакетов
+
+```shell
+docker run \
+  --rm \
+  -v $PWD:/var/www/html \
+  -u $(id -u):$(id -g) \
+  bestspacejam/laravel-apache \
+  sh -c 'composer update'
+```
+
 
 \* Пока не придумал как вызывать версию laravel-apache используемую в проекте. Можно ставить через `docker-compose run`
 
@@ -35,9 +49,7 @@ docker run \
 sudo chown -R $(id -u):$(id -g) application/
 
 cp ./laravel-application/Dockerfile ./application
-
 cp ./laravel-application/config/database.php application/config/
-
 ```
 
 
@@ -47,9 +59,27 @@ cp ./laravel-application/config/database.php application/config/
 - `MIGRATE` (true, "") - Запуск миграций при запуске сервера
 
 
-### Пример конфигурации для Docker Compose
+## Dockerfile
 
-Для первичной инициализации проекта и запуска в режиме разработки
+```Dockerfile
+FROM bestspacejam/laravel-apache:0.0.1
+
+ENV WORKDIR /var/www/html
+
+WORKDIR ${WORKDIR}
+VOLUME ${WORKDIR}/storage
+
+# Владелец должен совпадать с пользователем от которого запущен сервер
+# (задаётся через переменные окружения APACHE_RUN_USER и APACHE_RUN_GROUP)
+COPY --chown=www-data:www-data . .
+
+EXPOSE 80
+```
+
+
+### Docker Compose
+
+Пример `docker-compose.yml` для инициализации файловой структуры хранилища проекта и запуска в режиме разработки:
 
 ```yaml
 version: "3"
@@ -62,22 +92,4 @@ services:
       CHECK_STORAGE: "true"
       MIGRATE: "true"
 
-```
-
-
-
-## Минимальный Dockerfile
-
-```Dockerfile
-FROM bestspacejam/laravel-apache:0.0.1
-
-ENV WORKDIR /var/www/html
-WORKDIR ${WORKDIR}
-VOLUME ${WORKDIR}/storage
-
-# Владелец должен совпадать с пользователем от которого запущен сервер
-# (задаётся через переменные окружения APACHE_RUN_USER и APACHE_RUN_GROUP)
-COPY --chown=www-data:www-data . .
-
-EXPOSE 80
 ```

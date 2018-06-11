@@ -54,11 +54,11 @@ RUN a2enmod rewrite
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Эти переменные заведены в родительском образе
+# Эти переменные определены в родительском образе
 ENV APACHE_RUN_USER  www-data
 ENV APACHE_RUN_GROUP www-data
 
-# Переменная заведена специально для этого образа
+# Переменная определена специально для этого образа
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 COPY docker-laravel-entrypoint.sh /usr/local/bin/
