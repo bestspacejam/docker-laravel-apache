@@ -8,10 +8,10 @@
 ```shell
 docker run \
   --rm \
-  -v $PWD:/var/www/html \
+  -v "$PWD":/var/www/html \
   -u $(id -u):$(id -g) \
   bestspacejam/laravel-apache \
-  sh -c 'composer create-project --prefer-dist laravel/laravel . "5.5.*"'
+  composer create-project --prefer-dist laravel/laravel . "5.5.*"
 ```
 
 
@@ -21,10 +21,10 @@ docker run \
 ```shell
 docker run \
   --rm \
-  -v $PWD:/var/www/html \
+  -v "$PWD":/var/www/html \
   -u $(id -u):$(id -g) \
   bestspacejam/laravel-apache \
-  sh -c 'composer require barryvdh/laravel-cors'
+  composer require barryvdh/laravel-cors
 ```
 
 
@@ -33,30 +33,14 @@ docker run \
 ```shell
 docker run \
   --rm \
-  -v $PWD:/var/www/html \
+  -v "$PWD":/var/www/html \
   -u $(id -u):$(id -g) \
   bestspacejam/laravel-apache \
-  sh -c 'composer update'
+  composer update
 ```
 
 
-\* Пока не придумал как вызывать версию laravel-apache используемую в проекте. Можно ставить через `docker-compose run`
-
-
-## Копирование конфигурации 
-
-```shell
-sudo chown -R $(id -u):$(id -g) application/
-
-cp ./laravel-application/Dockerfile ./application
-cp ./laravel-application/config/database.php application/config/
-```
-
-
-## Параметры инициализации сервера
-
-- `CHECK_STORAGE` (true, "") - Проверка и создание дерева разделов в директории /storage
-- `MIGRATE` (true, "") - Запуск миграций при запуске сервера
+*Пока не придумал как вызывать версию laravel-apache используемую в проекте, можно ставить пакеты через `docker-compose run`*
 
 
 ## Dockerfile
@@ -77,7 +61,7 @@ EXPOSE 80
 ```
 
 
-### Docker Compose
+## Docker Compose
 
 Пример `docker-compose.yml` для инициализации файловой структуры хранилища проекта и запуска в режиме разработки:
 
@@ -93,3 +77,9 @@ services:
       MIGRATE: "true"
 
 ```
+
+
+### Переменные окружения
+
+- `CHECK_STORAGE` (true, "") - Проверка и создание дерева разделов в директории /storage
+- `MIGRATE` (true, "") - Запуск миграций при запуске сервера
